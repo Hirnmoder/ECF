@@ -1,0 +1,6 @@
+[submodule "src/nsec"]
+	path = src/nsec
+	url = https://github.com/Hirnmoder/nsec.git
+[submodule "src/yae"]
+	path = src/yae
+	url = https://github.com/Hirnmoder/yae.git

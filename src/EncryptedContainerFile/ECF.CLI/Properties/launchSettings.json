@@ -1,0 +1,37 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "environmentVariables": {},
+      "distributionName": ""
+    },
+    "ECF.CLI create": {
+      "commandName": "Project",
+      "commandLineArgs": "create test.ecf"
+    },
+    "ECF.CLI generate": {
+      "commandName": "Project",
+      "commandLineArgs": "generate"
+    },
+    "ECF.CLI decrypt": {
+      "commandName": "Project",
+      "commandLineArgs": "decrypt test.ecf"
+    },
+    "ECF.CLI export public key": {
+      "commandName": "Project",
+      "commandLineArgs": "export-public-key public_key.pk"
+    },
+    "ECF.CLI add recipient": {
+      "commandName": "Project",
+      "commandLineArgs": "add-recipient test.ecf -r public_key.pk"
+    },
+    "ECF.CLI info": {
+      "commandName": "Project",
+      "commandLineArgs": "info test.ecf"
+    },
+    "ECF.CLI modify": {
+      "commandName": "Project",
+      "commandLineArgs": "modify test.ecf"
+    }
+  }
+}

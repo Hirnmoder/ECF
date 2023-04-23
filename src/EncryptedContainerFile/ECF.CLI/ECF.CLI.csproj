@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ErrorReport>none</ErrorReport>
+    <StartupObject>ECF.CLI.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\yae\src\Yae.Core\Yae.Core.csproj" />
+    <ProjectReference Include="..\ECF.Core\ECF.Core.csproj" />
+  </ItemGroup>
+
+</Project>
