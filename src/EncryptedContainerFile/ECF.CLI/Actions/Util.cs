@@ -1,4 +1,5 @@
 ﻿using ECF.CLI.Arguments;
+using ECF.Core.Container;
 using ECF.Core.Primitives;
 using System;
 using System.IO;
@@ -53,6 +54,16 @@ namespace ECF.CLI.Actions
                 return Path.Combine(homeFolder, "ecf.keyfile");
             }
             return arg.Keyfile;
+        }
+
+        internal static CipherSuite GetCipherSuite(CLICipherSuite cs)
+        {
+            return cs switch
+            {
+                CLICipherSuite.X25519_AESGCM_ED25519_SHA256 => CipherSuite.X25519_AESgcm_Ed25519_Sha256,
+                CLICipherSuite.X25519_AESGCM_ED25519_SHA512 => CipherSuite.X25519_AESgcm_Ed25519_Sha512,
+                _ => throw new InvalidDataException($"Cipher Suite {cs} not recognized."),
+            };
         }
     }
 }

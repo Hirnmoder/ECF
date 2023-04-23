@@ -17,7 +17,8 @@ namespace ECF.CLI.Actions
                 using var p = Util.PromptPassword();
                 using var k = ECFKey.Load(Util.GetKeyfilename(arg), p);
 
-                using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha512, ContentType.Blob);
+                var cs = Util.GetCipherSuite(arg.CipherSuite);
+                using var ec = EncryptedContainer.Create(cs, ContentType.Blob);
                 ec.AddRecipientFromPrivateKey(k, Environment.UserName);
 
                 using var sw = new StreamWriter(ec.ContentStream, Encoding.UTF8, leaveOpen: true);

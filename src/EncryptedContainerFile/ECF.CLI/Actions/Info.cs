@@ -22,6 +22,7 @@ namespace ECF.CLI.Actions
 
                 Console.WriteLine($"Information about file {arg.Filepath}");
                 Console.WriteLine($"Container Version:     {ec.ContainerVersion}");
+                Console.WriteLine($"Cipher Suite:          {ec.CipherSuite}");
                 Console.WriteLine($"Content Length:        {ec.ContentStream.Length}");
                 Console.WriteLine($"Content Type:          {ec.ContentType.FriendlyName}");
                 Console.WriteLine($"Recipients:            {ec.Recipients.Length}");

@@ -1,6 +1,5 @@
 ﻿using ECF.Core.Container;
 using ECF.Core.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using System.Text;
 
