@@ -27,7 +27,7 @@ namespace ECF.Core.Primitives
         }
 
         /// <summary>
-        /// Creates a new <see cref="ECFKey"/> based on random initialization. 
+        /// Creates a new <see cref="ECFKey"/> based on random initialization.
         /// </summary>
         /// <returns>The newly created <see cref="ECFKey"/>.</returns>
         public static ECFKey Create()
@@ -51,7 +51,7 @@ namespace ECF.Core.Primitives
                 throw new ArgumentNullException(nameof(filename));
 
             if (!File.Exists(filename))
-                throw new FileNotFoundException(filename);
+                throw new FileNotFoundException($"File not found: {filename}");
 
             var fileContent = new ReadOnlySpan<byte>(File.ReadAllBytes(filename));
             var saltNonce = fileContent[..SALT_NONCE_LENGTH];

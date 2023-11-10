@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 ARG TARGETARCH=linux-x64
 ARG SELFCONTAINED=true
 ARG SINGLEFILE=true
+ARG RUNTIME=net7.0
 WORKDIR /source
 
 # copy all csproj files
@@ -13,7 +14,8 @@ COPY EncryptedContainerFile/ECF.CLI/*.csproj EncryptedContainerFile/ECF.CLI/
 COPY EncryptedContainerFile/ECF.Core/*.csproj EncryptedContainerFile/ECF.Core/
 
 # restore
-RUN dotnet restore EncryptedContainerFile/ECF.CLI/ECF.CLI.csproj
+RUN dotnet restore EncryptedContainerFile/ECF.CLI/ECF.CLI.csproj \
+    -r $TARGETARCH
 
 # copy all content
 COPY nsec/src/Cryptography/ nsec/src/Cryptography/
@@ -25,5 +27,11 @@ COPY EncryptedContainerFile/ECF.Core/ EncryptedContainerFile/ECF.Core/
 
 
 # build
-RUN dotnet publish /source/EncryptedContainerFile/ECF.CLI -r $TARGETARCH --sc $SELFCONTAINED -p:PublishSingleFile=$SINGLEFILE --no-restore -o /app
-
+RUN dotnet publish /source/EncryptedContainerFile/ECF.CLI \
+    -r $TARGETARCH \
+    --sc $SELFCONTAINED \
+    -p:PublishSingleFile=$SINGLEFILE \
+    --no-restore \
+    -o /app \
+    -c Release \
+    -f $RUNTIME

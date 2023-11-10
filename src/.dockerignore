@@ -1,0 +1,6 @@
+# ignore bin and obj folders
+**/bin/
+**/obj/
+
+# ignore publish folders
+**/publish/
