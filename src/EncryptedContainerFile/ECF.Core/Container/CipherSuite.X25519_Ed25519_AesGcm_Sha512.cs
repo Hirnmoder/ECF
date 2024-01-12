@@ -2,11 +2,11 @@
 
 namespace ECF.Core.Container
 {
-	public class CSX25519AesGcmEd25519Sha512 : CSX25519AesGcmEd25519ShaX
+	public class CSX25519Ed25519AesGcmSha512 : CSX25519Ed25519AesGcmShaX
 	{
 		internal override uint Identifier => 0x01010102u;
 
-		public CSX25519AesGcmEd25519Sha512()
+		public CSX25519Ed25519AesGcmSha512()
 			: base(HashAlgorithm.Sha512)
 		{
 		}

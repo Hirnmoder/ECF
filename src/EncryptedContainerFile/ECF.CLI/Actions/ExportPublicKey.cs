@@ -20,12 +20,12 @@ namespace ECF.CLI.Actions
                 while (string.IsNullOrWhiteSpace(name))
                     name = Util.Prompt("Please enter a string to sign (usually the name of the key pair holder): ");
 
-                var exported = k.ExportAsRecipient(CipherSuite.X25519_AESgcm_Ed25519_Sha256, name);
+                var exported = k.ExportAsRecipient(CipherSuite.X25519_Ed25519_AESgcm_Sha256, name);
                 using var fs = File.Create(arg.Filepath);
                 exported.Write(fs);
                 fs.Flush();
                 fs.Close();
-                
+
                 return ExitCode.OK;
             }
             catch (Exception e)

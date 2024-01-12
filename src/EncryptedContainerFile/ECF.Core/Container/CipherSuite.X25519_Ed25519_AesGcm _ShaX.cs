@@ -6,14 +6,14 @@ using System.IO;
 
 namespace ECF.Core.Container
 {
-    public abstract class CSX25519AesGcmEd25519ShaX : CipherSuite
+    public abstract class CSX25519Ed25519AesGcmShaX : CipherSuite
     {
         private const int SHARED_SECRET_LENGTH = 32; // Curve25519 Point
 
         internal override int KeyAgreementInfoSize => KAI_X25519_AesGcm_Ed25519_ShaX.Size;
 
-        internal CSX25519AesGcmEd25519ShaX(HashAlgorithm hashAlgorithm)
-            : base(KeyAgreementAlgorithm.X25519, AeadAlgorithm.Aes256Gcm, SignatureAlgorithm.Ed25519, hashAlgorithm)
+        internal CSX25519Ed25519AesGcmShaX(HashAlgorithm hashAlgorithm)
+            : base(KeyAgreementAlgorithm.X25519, SignatureAlgorithm.Ed25519, AeadAlgorithm.Aes256Gcm, hashAlgorithm)
         { }
 
         internal override Key GetSymmetricKey(ECFKey privateKey, KeyAgreementInfo keyAgreementInfo)

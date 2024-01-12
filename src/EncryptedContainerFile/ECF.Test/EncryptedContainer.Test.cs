@@ -23,7 +23,7 @@ namespace ECF.Test
         {
             using var key = ECFKey.Create();
 
-            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key, RecipientName(0));
             using var ms = new MemoryStream();
             ec.Write(ms);
@@ -49,7 +49,7 @@ namespace ECF.Test
 
             using var key = ECFKey.Create();
 
-            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key, RecipientName(0));
 
             ec.ContentStream.Write(randomData);
@@ -80,7 +80,7 @@ namespace ECF.Test
 
             using var key = ECFKey.Create();
 
-            using var container = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var container = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             container.AddRecipientFromPrivateKey(key, RecipientName(0));
             using (var strw = new StreamWriter(container.ContentStream, Encoding.UTF8, leaveOpen: true))
             {
@@ -160,7 +160,7 @@ namespace ECF.Test
 
             using var key = ECFKey.Create();
 
-            using var container = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var container = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             container.AddRecipientFromPrivateKey(key, RecipientName(0));
             using (var strw = new StreamWriter(container.ContentStream, Encoding.UTF8, leaveOpen: true))
             {
@@ -236,7 +236,7 @@ namespace ECF.Test
 
             var loadingTimes = new long[n];
 
-            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
 
             var sw = Stopwatch.StartNew();
             for (int i = 0; i < n; i++)
@@ -288,7 +288,7 @@ namespace ECF.Test
 
         public void CreateAndDecryptContainerMultipleKeysAddRecipient(int n)
         {
-            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             using var masterKey = ECFKey.Create();
 
             var keysToAdd = new ECFKey[n];
@@ -352,7 +352,7 @@ namespace ECF.Test
             using var key2 = ECFKey.Create();
             using var key3 = ECFKey.Create();
 
-            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
+            using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key1, RecipientName(0));
 
             ec.ContentStream.Write(randomData);
@@ -432,7 +432,7 @@ namespace ECF.Test
     public class EncryptedContainerTest_CSX25519AesGcmEd25519Sha256 : EncryptedContainerTest
     {
         public EncryptedContainerTest_CSX25519AesGcmEd25519Sha256()
-            : base(CipherSuite.X25519_AESgcm_Ed25519_Sha256)
+            : base(CipherSuite.X25519_Ed25519_AESgcm_Sha256)
         {
         }
     }
@@ -441,7 +441,7 @@ namespace ECF.Test
     public class EncryptedContainerTest_CSX25519AesGcmEd25519Sha512 : EncryptedContainerTest
     {
         public EncryptedContainerTest_CSX25519AesGcmEd25519Sha512()
-            : base(CipherSuite.X25519_AESgcm_Ed25519_Sha512)
+            : base(CipherSuite.X25519_Ed25519_AESgcm_Sha512)
         {
         }
     }

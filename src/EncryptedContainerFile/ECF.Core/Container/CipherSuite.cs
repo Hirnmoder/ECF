@@ -7,24 +7,24 @@ namespace ECF.Core.Container
 {
     public abstract class CipherSuite
     {
-        public static readonly CSX25519AesGcmEd25519Sha256 X25519_AESgcm_Ed25519_Sha256 = new();
-        public static readonly CSX25519AesGcmEd25519Sha512 X25519_AESgcm_Ed25519_Sha512 = new();
+        public static readonly CSX25519Ed25519AesGcmSha256 X25519_Ed25519_AESgcm_Sha256 = new();
+        public static readonly CSX25519Ed25519AesGcmSha512 X25519_Ed25519_AESgcm_Sha512 = new();
 
         private static readonly CipherSuite[] CipherSuites;
 
         internal KeyAgreementAlgorithm KeyAgreementAlgorithm { get; }
-        internal AeadAlgorithm SymmetricEncryptionAlgorithm { get; }
         internal SignatureAlgorithm SignatureAlgorithm { get; }
+        internal AeadAlgorithm SymmetricEncryptionAlgorithm { get; }
         internal HashAlgorithm HashAlgorithm { get; }
         internal abstract uint Identifier { get; }
 
         internal abstract int KeyAgreementInfoSize { get; }
 
-        protected private CipherSuite(KeyAgreementAlgorithm keyAgreementAlgorithm, AeadAlgorithm symmetricEncryptionAlgorithm, SignatureAlgorithm signatureAlgorithm, HashAlgorithm hashAlgorithm)
+        protected private CipherSuite(KeyAgreementAlgorithm keyAgreementAlgorithm, SignatureAlgorithm signatureAlgorithm, AeadAlgorithm symmetricEncryptionAlgorithm, HashAlgorithm hashAlgorithm)
         {
             this.KeyAgreementAlgorithm = keyAgreementAlgorithm;
-            this.SymmetricEncryptionAlgorithm = symmetricEncryptionAlgorithm;
             this.SignatureAlgorithm = signatureAlgorithm;
+            this.SymmetricEncryptionAlgorithm = symmetricEncryptionAlgorithm;
             this.HashAlgorithm = hashAlgorithm;
         }
 
