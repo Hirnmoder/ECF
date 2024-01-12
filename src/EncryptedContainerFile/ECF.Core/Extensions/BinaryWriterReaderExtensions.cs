@@ -8,9 +8,10 @@ namespace ECF.Core.Extensions
     {
         internal static void WriteECFString(this BinaryWriter bw, string value)
         {
-            // 4 bytes length, then UTF-8
-            bw.Write((uint)value.Length);
-            bw.Write(Encoding.UTF8.GetBytes(value));
+            // 4 bytes length in bytes, then UTF-8
+            var bytes = Encoding.UTF8.GetBytes(value);
+            bw.Write((uint)bytes.Length);
+            bw.Write(bytes);
         }
     }
 

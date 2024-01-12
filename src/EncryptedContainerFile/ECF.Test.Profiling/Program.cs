@@ -13,7 +13,10 @@ namespace ECF.Test.Profiling
             {
                 if(m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
                 {
+                    Console.WriteLine($"Running Test {m.Name}");
                     m.Invoke(t, null);
+                    Console.WriteLine($"Test {m.Name} succeeded");
+                    Console.WriteLine();
                 }
             }
         }

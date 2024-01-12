@@ -39,7 +39,7 @@ namespace ECF.Core.Container
 
     public class CTBlob : ContentType
     {
-        public override uint Identifier => 0x000001u;
+        public override uint Identifier => 0x00000001u;
         public override string FriendlyName => "Binary Large Object (BLOB)";
     }
 

@@ -36,9 +36,15 @@ namespace ECF.Test
         }
 
         [TestMethod]
-        public void CreateAndDecryptContainerWithContent()
+        public void CreateAndDecryptContainerWithContent10MB()
+            => CreateAndDecryptContainerWithContent(10);
+
+        public void CreateAndDecryptContainerWithContent100MB()
+            => CreateAndDecryptContainerWithContent(100);
+
+        public void CreateAndDecryptContainerWithContent(int size)
         {
-            var randomData = new byte[1024 * 1024 * 10]; // 10 MB
+            var randomData = new byte[1024 * 1024 * size]; // size MB
             randomData.AsSpan().FillRandom();
 
             using var key = ECFKey.Create();
@@ -88,7 +94,7 @@ namespace ECF.Test
             var loadedContainer = new EncryptedContainer[n];
 
             sw.Stop();
-            this.TestContext.WriteLine($"Preparation took {sw.ElapsedMilliseconds}ms");
+            this.TestContext.WriteLine($"Preparation took {sw.ElapsedTicks * 1000.0 / Stopwatch.Frequency:n2}ms");
 
             // Writing
             sw.Restart();
@@ -99,7 +105,7 @@ namespace ECF.Test
             }
 
             sw.Stop();
-            this.TestContext.WriteLine($"Writing took {sw.ElapsedMilliseconds}ms for {n} container");
+            this.TestContext.WriteLine($"Writing took {sw.ElapsedTicks * 1000.0 / Stopwatch.Frequency:n2}ms for {n} container");
 
             // Reset for Loading
             for (int i = 0; i < n; i++)
@@ -118,7 +124,7 @@ namespace ECF.Test
             }
 
             sw.Stop();
-            this.TestContext.WriteLine($"Loading took {sw.ElapsedMilliseconds}ms for {n} container");
+            this.TestContext.WriteLine($"Loading took {sw.ElapsedTicks * 1000.0 / Stopwatch.Frequency:n2}ms for {n} container");
 
             // Disposing at end
             for (int i = 0; i < n; i++)
@@ -148,7 +154,7 @@ namespace ECF.Test
         {
             var sw = Stopwatch.StartNew();
 
-            const int n = 10000;
+            const int n = 10_000;
             var writingTimes = new long[n];
             var loadingTimes = new long[n];
 
@@ -200,15 +206,30 @@ namespace ECF.Test
             }
             stream.Dispose();
 
-            this.TestContext.WriteLine($"Average loading time: {loadingTimes.Average() / Stopwatch.Frequency * 1000} ms");
-            this.TestContext.WriteLine($"Average writing time: {writingTimes.Average() / Stopwatch.Frequency * 1000} ms");
+            this.TestContext.WriteLine($"Average loading time: {loadingTimes.Average() * 1000.0 / Stopwatch.Frequency:n4}ms for n={n}");
+            this.TestContext.WriteLine($"Average writing time: {writingTimes.Average() * 1000.0 / Stopwatch.Frequency:n4}ms for n={n}");
         }
 
 
         [TestMethod]
-        public void CreateAndDecryptContainerMultipleKeys()
+        public void CreateAndDecryptContainerMultipleKeys10()
+            => CreateAndDecryptContainerMultipleKeys(10);
+
+        [TestMethod]
+        public void CreateAndDecryptContainerMultipleKeys200()
+            => CreateAndDecryptContainerMultipleKeys(200);
+
+        [TestMethod]
+        public void CreateAndDecryptContainerMultipleKeys500()
+            => CreateAndDecryptContainerMultipleKeys(500);
+
+        [TestMethod]
+        public void CreateAndDecryptContainerMultipleKeys1000()
+            => CreateAndDecryptContainerMultipleKeys(1000);
+
+
+        public void CreateAndDecryptContainerMultipleKeys(int n)
         {
-            const int n = 200;
             var keys = new ECFKey[n];
             for (int i = 0; i < n; i++)
                 keys[i] = ECFKey.Create();
@@ -221,7 +242,7 @@ namespace ECF.Test
             for (int i = 0; i < n; i++)
                 ec.AddRecipientFromPrivateKey(keys[i], RecipientName(i));
             sw.Stop();
-            this.TestContext.WriteLine($"Adding Recipients took {sw.ElapsedMilliseconds}ms");
+            this.TestContext.WriteLine($"Adding {n + 1} Recipients from private keys took {sw.ElapsedTicks * 1000.0 / Stopwatch.Frequency:n2}ms");
 
             ec.ContentStream.Write(Encoding.UTF8.GetBytes(nameof(CreateAndDecryptContainerMultipleKeys)));
 
@@ -236,47 +257,65 @@ namespace ECF.Test
                 sw.Restart();
                 using var loadedEc = EncryptedContainer.Load(ms, keys[i], i == 0);
                 sw.Stop();
-                loadingTimes[i] = sw.ElapsedMilliseconds;
+                loadingTimes[i] = sw.ElapsedTicks;
 
                 Assert.AreEqual(n, loadedEc.Recipients.Length);
                 AssertEC(ec, loadedEc);
             }
 
-            this.TestContext.WriteLine($"Loading times: {loadingTimes.Average()}ms (avg), {loadingTimes.Min()}ms (min), {loadingTimes.Max()}ms (max)");
+            this.TestContext.WriteLine($"Loading times: {loadingTimes.Average() * 1000.0 / Stopwatch.Frequency:n2}ms (avg), {loadingTimes.Min() * 1000.0 / Stopwatch.Frequency:n2}ms (min), {loadingTimes.Max() * 1000.0 / Stopwatch.Frequency:n2}ms (max)");
 
             for (int i = 0; i < n; i++)
                 keys[i].Dispose();
         }
 
         [TestMethod]
-        public void CreateAndDecryptContainerMultipleKeysAddRecipient()
-        {
-            const int n = 200;
+        public void CreateAndDecryptContainerMultipleKeysAddRecipient10()
+            => CreateAndDecryptContainerMultipleKeysAddRecipient(10);
 
+        [TestMethod]
+        public void CreateAndDecryptContainerMultipleKeysAddRecipient200()
+            => CreateAndDecryptContainerMultipleKeysAddRecipient(200);
+
+        [TestMethod]
+        public void CreateAndDecryptContainerMultipleKeysAddRecipient500()
+            => CreateAndDecryptContainerMultipleKeysAddRecipient(500);
+
+        [TestMethod]
+        public void CreateAndDecryptContainerMultipleKeysAddRecipient1000()
+            => CreateAndDecryptContainerMultipleKeysAddRecipient(1000);
+
+
+        public void CreateAndDecryptContainerMultipleKeysAddRecipient(int n)
+        {
+            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
             using var masterKey = ECFKey.Create();
 
             var keysToAdd = new ECFKey[n];
             for (int i = 0; i < n; i++)
                 keysToAdd[i] = ECFKey.Create();
+            var exportedRecipientStreams = new MemoryStream[n];
+            for (int i = 0; i < n; i++)
+            {
+                exportedRecipientStreams[i] = new MemoryStream();
+                keysToAdd[i].ExportAsRecipient(ec.CipherSuite, RecipientName(i)).Write(exportedRecipientStreams[i]);
+            }
 
             var loadingTimes = new long[n];
 
-            using var ec = EncryptedContainer.Create(CipherSuite.X25519_AESgcm_Ed25519_Sha256, ContentType.Blob);
 
-            var sw = Stopwatch.StartNew();
             ec.AddRecipientFromPrivateKey(masterKey, RecipientName(-1));
+            var sw = Stopwatch.StartNew();
             for (int i = 0; i < n; i++)
             {
-                using var rms = new MemoryStream();
-                var r = keysToAdd[i].ExportAsRecipient(ec.CipherSuite, RecipientName(i));
-                r.Write(rms);
+                using var rms = exportedRecipientStreams[i];
                 rms.Position = 0;
                 ec.AddRecipientFromExport(rms);
                 rms.Close();
                 rms.Dispose();
             }
             sw.Stop();
-            this.TestContext.WriteLine($"Adding Recipients took {sw.ElapsedMilliseconds}ms");
+            this.TestContext.WriteLine($"Adding {n} Recipients by exported public keys took {sw.ElapsedTicks * 1000.0 / Stopwatch.Frequency:n2}ms");
 
             ec.ContentStream.Write(Encoding.UTF8.GetBytes(nameof(CreateAndDecryptContainerMultipleKeysAddRecipient)));
 
@@ -291,13 +330,13 @@ namespace ECF.Test
                 sw.Restart();
                 using var loadedEc = EncryptedContainer.Load(ms, keysToAdd[i], i == 0);
                 sw.Stop();
-                loadingTimes[i] = sw.ElapsedMilliseconds;
+                loadingTimes[i] = sw.ElapsedTicks;
 
                 Assert.AreEqual(n + 1, loadedEc.Recipients.Length);
                 AssertEC(ec, loadedEc);
             }
 
-            this.TestContext.WriteLine($"Loading times: {loadingTimes.Average()}ms (avg), {loadingTimes.Min()}ms (min), {loadingTimes.Max()}ms (max)");
+            this.TestContext.WriteLine($"Loading times: {loadingTimes.Average() * 1000.0 / Stopwatch.Frequency:n2}ms (avg), {loadingTimes.Min() * 1000.0 / Stopwatch.Frequency:n2}ms (min), {loadingTimes.Max() * 1000.0 / Stopwatch.Frequency:n2}ms (max)");
 
             for (int i = 0; i < n; i++)
                 keysToAdd[i].Dispose();
@@ -365,7 +404,7 @@ namespace ECF.Test
         }
 
 
-            private void AssertEC(EncryptedContainer expected, EncryptedContainer actual)
+        private void AssertEC(EncryptedContainer expected, EncryptedContainer actual)
         {
             Assert.AreEqual(expected.ContainerVersion, actual.ContainerVersion);
             Assert.AreEqual(expected.ContentType, actual.ContentType);
