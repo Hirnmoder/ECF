@@ -429,19 +429,37 @@ namespace ECF.Test
     }
 
     [TestClass]
-    public class EncryptedContainerTest_CSX25519AesGcmEd25519Sha256 : EncryptedContainerTest
+    public class EncryptedContainerTest_CSX25519Ed25519AesGcmSha256 : EncryptedContainerTest
     {
-        public EncryptedContainerTest_CSX25519AesGcmEd25519Sha256()
-            : base(CipherSuite.X25519_Ed25519_AESgcm_Sha256)
+        public EncryptedContainerTest_CSX25519Ed25519AesGcmSha256()
+            : base(CipherSuite.X25519_Ed25519_AesGcm_Sha256)
         {
         }
     }
 
     [TestClass]
-    public class EncryptedContainerTest_CSX25519AesGcmEd25519Sha512 : EncryptedContainerTest
+    public class EncryptedContainerTest_CSX25519Ed25519AesGcmSha512 : EncryptedContainerTest
     {
-        public EncryptedContainerTest_CSX25519AesGcmEd25519Sha512()
-            : base(CipherSuite.X25519_Ed25519_AESgcm_Sha512)
+        public EncryptedContainerTest_CSX25519Ed25519AesGcmSha512()
+            : base(CipherSuite.X25519_Ed25519_AesGcm_Sha512)
+        {
+        }
+    }
+
+    [TestClass]
+    public class EncryptedContainerTest_CSX25519Ed25519AegisSha256 : EncryptedContainerTest
+    {
+        public EncryptedContainerTest_CSX25519Ed25519AegisSha256()
+            : base(CipherSuite.X25519_Ed25519_Aegis_Sha256)
+        {
+        }
+    }
+
+    [TestClass]
+    public class EncryptedContainerTest_CSX25519Ed25519AegisSha512 : EncryptedContainerTest
+    {
+        public EncryptedContainerTest_CSX25519Ed25519AegisSha512()
+            : base(CipherSuite.X25519_Ed25519_Aegis_Sha512)
         {
         }
     }

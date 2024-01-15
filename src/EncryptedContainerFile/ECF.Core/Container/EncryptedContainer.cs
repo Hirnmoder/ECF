@@ -345,9 +345,7 @@ namespace ECF.Core.Container
         {
             int amount;
 
-            if (encryptedData.Length < cipherSuite.SymmetricEncryptionAlgorithm.TagSize)
-                throw new EncryptedContainerException($"Encrypted data is shorter than the tag size");
-            uint decryptedLength = (uint)(encryptedData.Length - cipherSuite.SymmetricEncryptionAlgorithm.TagSize);
+            uint decryptedLength = cipherSuite.GetPlaintextLength((uint)encryptedData.Length);
             using var privateDecrypted = new FixedBytes(decryptedLength);
             if (!cipherSuite.Decrypt(symmetricKey, symmetricNonce, encryptedData, privateDecrypted.GetDataAsSpan()))
                 throw new EncryptedContainerException($"Decryption with symmetric key failed.");

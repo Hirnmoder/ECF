@@ -7,8 +7,11 @@ namespace ECF.Core.Container
 {
     public abstract class CipherSuite
     {
-        public static readonly CSX25519Ed25519AesGcmSha256 X25519_Ed25519_AESgcm_Sha256 = new();
-        public static readonly CSX25519Ed25519AesGcmSha512 X25519_Ed25519_AESgcm_Sha512 = new();
+        public static readonly CSX25519Ed25519AesGcmSha256 X25519_Ed25519_AesGcm_Sha256 = new();
+        public static readonly CSX25519Ed25519AesGcmSha512 X25519_Ed25519_AesGcm_Sha512 = new();
+
+        public static readonly CSX25519Ed25519AegisSha256 X25519_Ed25519_Aegis_Sha256 = new();
+        public static readonly CSX25519Ed25519AegisSha512 X25519_Ed25519_Aegis_Sha512 = new();
 
         private static readonly CipherSuite[] CipherSuites;
 
@@ -66,6 +69,9 @@ namespace ECF.Core.Container
 
         internal virtual bool Decrypt(Key symmetricKey, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> ciphertext, Span<byte> plaintext, ReadOnlySpan<byte> associatedData = default)
             => this.SymmetricEncryptionAlgorithm.Decrypt(symmetricKey, nonce, associatedData, ciphertext, plaintext);
+
+        internal virtual uint GetPlaintextLength(uint ciphertextLength)
+            => throw new NotImplementedException();
 
         internal virtual void Hash(ReadOnlySpan<byte> data, Span<byte> hash)
             => this.HashAlgorithm.Hash(data, hash);

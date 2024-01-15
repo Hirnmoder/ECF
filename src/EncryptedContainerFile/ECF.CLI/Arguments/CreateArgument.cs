@@ -6,6 +6,9 @@ namespace ECF.CLI.Arguments
     {
         X25519_ED25519_AESGCM_SHA256,
         X25519_ED25519_AESGCM_SHA512,
+
+        X25519_ED25519_AEGIS_SHA256,
+        X25519_ED25519_AEGIS_SHA512,
     }
 
     [Verb("create", aliases: new[] {"c"}, HelpText = "Create a new encrypted container file")]

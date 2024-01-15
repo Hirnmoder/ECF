@@ -7,16 +7,23 @@ namespace ECF.Test.Profiling
     {
         static void Main(string[] args)
         {
-            var t = new EncryptedContainerTest_CSX25519AesGcmEd25519Sha512();
-            t.TestContext = new SimpleTestContext();
-            foreach(var m in t.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+            foreach (var t in new EncryptedContainerTest[] {
+                new EncryptedContainerTest_CSX25519Ed25519AesGcmSha256(),
+                new EncryptedContainerTest_CSX25519Ed25519AesGcmSha512(),
+                new EncryptedContainerTest_CSX25519Ed25519AegisSha256(),
+                new EncryptedContainerTest_CSX25519Ed25519AegisSha512(),
+            })
             {
-                if(m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
+                t.TestContext = new SimpleTestContext();
+                foreach (var m in t.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
                 {
-                    Console.WriteLine($"Running Test {m.Name}");
-                    m.Invoke(t, null);
-                    Console.WriteLine($"Test {m.Name} succeeded");
-                    Console.WriteLine();
+                    if (m.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
+                    {
+                        Console.WriteLine($"Running Test {m.Name}");
+                        m.Invoke(t, null);
+                        Console.WriteLine($"Test {m.Name} succeeded");
+                        Console.WriteLine();
+                    }
                 }
             }
         }

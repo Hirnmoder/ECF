@@ -9,6 +9,10 @@
       "commandName": "Project",
       "commandLineArgs": "create test.ecf"
     },
+    "ECF.CLI create aegis": {
+      "commandName": "Project",
+      "commandLineArgs": "create test.ecf --cipher-suite X25519_ED25519_AEGIS_SHA512"
+    },
     "ECF.CLI generate": {
       "commandName": "Project",
       "commandLineArgs": "generate"

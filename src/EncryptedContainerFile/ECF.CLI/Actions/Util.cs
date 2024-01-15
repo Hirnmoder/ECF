@@ -60,8 +60,10 @@ namespace ECF.CLI.Actions
         {
             return cs switch
             {
-                CLICipherSuite.X25519_ED25519_AESGCM_SHA256 => CipherSuite.X25519_Ed25519_AESgcm_Sha256,
-                CLICipherSuite.X25519_ED25519_AESGCM_SHA512 => CipherSuite.X25519_Ed25519_AESgcm_Sha512,
+                CLICipherSuite.X25519_ED25519_AESGCM_SHA256 => CipherSuite.X25519_Ed25519_AesGcm_Sha256,
+                CLICipherSuite.X25519_ED25519_AESGCM_SHA512 => CipherSuite.X25519_Ed25519_AesGcm_Sha512,
+                CLICipherSuite.X25519_ED25519_AEGIS_SHA256 => CipherSuite.X25519_Ed25519_Aegis_Sha256,
+                CLICipherSuite.X25519_ED25519_AEGIS_SHA512 => CipherSuite.X25519_Ed25519_Aegis_Sha512,
                 _ => throw new InvalidDataException($"Cipher Suite {cs} not recognized."),
             };
         }
