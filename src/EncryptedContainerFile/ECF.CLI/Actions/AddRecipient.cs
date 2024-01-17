@@ -23,7 +23,7 @@ namespace ECF.CLI.Actions
                 fsECread.Close();
                 fsECread.Dispose();
 
-                ec.AddRecipientFromExport(fsRread);
+                ec.AddRecipientFromExport(fsRread, arg.AllowDuplicateNames);
                 fsRread.Close();
                 fsRread.Dispose();
 

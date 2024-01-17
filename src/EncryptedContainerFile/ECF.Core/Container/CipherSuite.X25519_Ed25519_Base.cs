@@ -25,6 +25,11 @@ namespace ECF.Core.Container
             return (uint)(ciphertextLength - this.SymmetricEncryptionAlgorithm.TagSize);
         }
 
+        internal override uint GetCiphertextLength(uint plaintextLength)
+        {
+             return plaintextLength + (uint)this.SymmetricEncryptionAlgorithm.TagSize;
+        }
+
         internal override Key GetSymmetricKey(ECFKey privateKey, KeyAgreementInfo keyAgreementInfo)
         {
             if (keyAgreementInfo is not KAI_X25519_Ed25519_Base kai)

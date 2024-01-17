@@ -73,6 +73,9 @@ namespace ECF.Core.Container
         internal virtual uint GetPlaintextLength(uint ciphertextLength)
             => throw new NotImplementedException();
 
+        internal virtual uint GetCiphertextLength(uint plaintextLength)
+            => throw new NotImplementedException();
+
         internal virtual void Hash(ReadOnlySpan<byte> data, Span<byte> hash)
             => this.HashAlgorithm.Hash(data, hash);
 

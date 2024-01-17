@@ -7,5 +7,8 @@ namespace ECF.CLI.Arguments
     {
         [Option('r', "recipient", Required = true, HelpText = "Recipient Public Key File")]
         public string RecipientPKFile { get; protected set; }
+
+        [Option("allow-duplicate-names", Required = false, Default = false, HelpText = "Allow adding a recipient whose name is already present in the recipient list.")]
+        public bool AllowDuplicateNames { get; protected set; }
     }
 }

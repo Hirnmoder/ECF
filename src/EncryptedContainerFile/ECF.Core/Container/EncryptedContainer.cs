@@ -38,17 +38,17 @@ namespace ECF.Core.Container
             return ec;
         }
 
-        public void AddRecipientFromPrivateKey(ECFKey privateKey, string name)
+        public void AddRecipientFromPrivateKey(ECFKey privateKey, string name, bool allowDuplicateNames = false)
         {
             var recipient = privateKey.ExportAsRecipient(this.CipherSuite, name);
-            this.AddRecipient(recipient);
+            this.AddRecipient(recipient, allowDuplicateNames);
         }
 
-        public void AddRecipientFromExport(Stream inStream)
+        public void AddRecipientFromExport(Stream inStream, bool allowDuplicateNames)
         {
             using var br = new BinaryReader(inStream, Encoding.UTF8, leaveOpen: true);
             var recipient = Recipient.Load(br, this.CipherSuite, true);
-            this.AddRecipient(recipient);
+            this.AddRecipient(recipient, allowDuplicateNames);
         }
 
         public void RemoveRecipientFromExport(Stream inStream)
@@ -99,7 +99,10 @@ namespace ECF.Core.Container
             posForPrivateLength = bw.BaseStream.Position;
             bw.Write(DUMMY_VALUE);
 
-            uint mRecipients = (uint)this.InternalRecipients.Count + (addFakeRecipients ? (uint)Primitives.Random.Uniform(8, this.InternalRecipients.Count + 1) : 0);
+            uint mRecipients = (uint)this.InternalRecipients.Count;
+            if (addFakeRecipients)
+                mRecipients = (uint)Primitives.Random.Uniform(this.InternalRecipients.Count, Math.Max(8, 2 * this.InternalRecipients.Count) + 1);
+
             bw.Write(mRecipients);
 
             Span<byte> recipientSalt = stackalloc byte[FieldLengthInfo.RECIPIENT_SALT];
@@ -334,7 +337,7 @@ namespace ECF.Core.Container
             bw.Close();
             ms.Close();
             ms.Dispose();
-            Span<byte> privateEncrypted = new byte[privateLength + this.CipherSuite.SymmetricEncryptionAlgorithm.TagSize];
+            Span<byte> privateEncrypted = new byte[this.CipherSuite.GetCiphertextLength(privateLength)];
             this.CipherSuite.Encrypt(symmetricKey, symmetricNonce, privateFixed.GetDataAsReadOnlySpan(), privateEncrypted);
             privateFixed.Dispose();
 
@@ -370,7 +373,7 @@ namespace ECF.Core.Container
             for (uint i = 0; i < nRecipientsPrivate; i++)
             {
                 var r = Recipient.Load(br, cipherSuite, verifySignatureOfEveryRecipient);
-                ec.AddRecipient(r);
+                ec.AddRecipient(r, true); // Allow duplicate names here to proceed loading
             }
 
             uint contentLength = br.ReadUInt32();
@@ -395,16 +398,23 @@ namespace ECF.Core.Container
             return ec;
         }
 
-        private void AddRecipient(Recipient recipient)
+        private void AddRecipient(Recipient recipient, bool allowDuplicateNames)
         {
             var existingRecipient = this.InternalRecipients.Find(r => r.PublicKey.Equals(recipient.PublicKey));
             if (existingRecipient == default)
             {
-                this.InternalRecipients.Add(recipient);
+                if (!allowDuplicateNames && this.InternalRecipients.Find(r => r.Name.Equals(recipient.Name, StringComparison.InvariantCultureIgnoreCase)) != default)
+                {
+                    throw new EncryptedContainerException($"Recipient {recipient.Name} is already member of the recipient list (by name).");
+                }
+                else
+                {
+                    this.InternalRecipients.Add(recipient);
+                }
             }
             else
             {
-                throw new EncryptedContainerException($"Recipient {recipient.Name} was already added to recipient list.");
+                throw new EncryptedContainerException($"Recipient {recipient.Name} is already member of the recipient list (by public key).");
             }
         }
 

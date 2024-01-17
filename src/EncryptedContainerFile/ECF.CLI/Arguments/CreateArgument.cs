@@ -15,7 +15,7 @@ namespace ECF.CLI.Arguments
     internal class CreateArgument : FileOperationArgumentBase
     {
         // ToDo: Support more Algorithms
-        [Option("cipher-suite", Default = CLICipherSuite.X25519_ED25519_AESGCM_SHA512, Required = false, HelpText = "Cipher Suite to use")]
+        [Option("cipher-suite", Default = CLICipherSuite.X25519_ED25519_AESGCM_SHA512, Required = false, HelpText = "Cipher Suite to use.")]
         public CLICipherSuite CipherSuite { get; set; }
 
         // ToDo: Support multiple Content Types (Key-Value-Store, Plain Text, Blob, ...)
