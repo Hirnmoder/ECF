@@ -110,4 +110,41 @@ namespace ECF.Test
         {
         }
     }
+
+
+    [TestClass]
+    public class EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AesGcmSha256 : EncryptedContainerPerformancePrimitivesTest
+    {
+        public EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AesGcmSha256()
+            : base(CipherSuite.X25519_Ed25519_AesGcm_Sha256)
+        {
+        }
+    }
+
+    [TestClass]
+    public class EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AesGcmSha512 : EncryptedContainerPerformancePrimitivesTest
+    {
+        public EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AesGcmSha512()
+            : base(CipherSuite.X25519_Ed25519_AesGcm_Sha512)
+        {
+        }
+    }
+
+    [TestClass]
+    public class EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AegisSha256 : EncryptedContainerPerformancePrimitivesTest
+    {
+        public EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AegisSha256()
+            : base(CipherSuite.X25519_Ed25519_Aegis_Sha256)
+        {
+        }
+    }
+
+    [TestClass]
+    public class EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AegisSha512 : EncryptedContainerPerformancePrimitivesTest
+    {
+        public EncryptedContainerPerformancePrimitivesTest_CSX25519Ed25519AegisSha512()
+            : base(CipherSuite.X25519_Ed25519_Aegis_Sha512)
+        {
+        }
+    }
 }
