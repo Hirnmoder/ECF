@@ -1,0 +1,24 @@
+\begin{tabular}{rcrrrr}
+\toprule
+ &  & \multicolumn{4}{c}{Cipher Suite} \\
+ &  & \multicolumn{1}{c}{\ref{e:cip:x25519-ed25519-aes256gcm-sha256}} & \multicolumn{1}{c}{\ref{e:cip:x25519-ed25519-aes256gcm-sha512}} & \multicolumn{1}{c}{\ref{e:cip:x25519-ed25519-aegis256-sha256}} & \multicolumn{1}{c}{\ref{e:cip:x25519-ed25519-aegis256-sha512}} \\
+Content Size & Run &  &  &  &  \\
+\midrule
+\multirow[c]{3}{*}{\qty{1}{\mebi\byte}} & R7 6850U (.NET 7.0) & 0.011 & 0.007 & 0.011 & 0.007 \\
+ & R7 6850U (.NET 8.0) & 0.011 & 0.007 & 0.011 & 0.007 \\
+ & R7 7900X (.NET 8.0) & 0.009 & 0.006 & 0.008 & 0.006 \\
+\cline{1-6}
+\multirow[c]{3}{*}{\qty{10}{\mebi\byte}} & R7 6850U (.NET 7.0) & 0.106 & 0.072 & 0.105 & 0.071 \\
+ & R7 6850U (.NET 8.0) & 0.106 & 0.071 & 0.106 & 0.070 \\
+ & R7 7900X (.NET 8.0) & 0.085 & 0.056 & 0.083 & 0.053 \\
+\cline{1-6}
+\multirow[c]{3}{*}{\qty{100}{\mebi\byte}} & R7 6850U (.NET 7.0) & 1.038 & 0.696 & 1.028 & 0.693 \\
+ & R7 6850U (.NET 8.0) & 1.030 & 0.746 & 1.028 & 0.687 \\
+ & R7 7900X (.NET 8.0) & 0.832 & 0.555 & 0.831 & 0.538 \\
+\cline{1-6}
+\multirow[c]{3}{*}{\qty{1000}{\mebi\byte}} & R7 6850U (.NET 7.0) & 10.882 & 7.557 & 10.836 & 7.436 \\
+ & R7 6850U (.NET 8.0) & 11.113 & 7.626 & 10.992 & 7.559 \\
+ & R7 7900X (.NET 8.0) & 8.212 & 5.677 & 8.366 & 5.415 \\
+\cline{1-6}
+\bottomrule
+\end{tabular}
