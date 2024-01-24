@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 ARG TARGETARCH=linux-x64
 ARG SELFCONTAINED=true
 ARG SINGLEFILE=true
-ARG RUNTIME=net7.0
+ARG RUNTIME=net8.0
 WORKDIR /source
 
 # copy all csproj files

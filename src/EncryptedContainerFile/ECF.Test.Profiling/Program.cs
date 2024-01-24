@@ -33,8 +33,14 @@ namespace ECF.Test.Profiling
                         // Force Garbage Collection multiple times to reduce memory consumption of this test run
                         GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
                         GC.Collect();
-                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
-                        GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
+                        const GCCollectionMode maxGCCollectionMode =
+                        #if NET7_0_OR_GREATER
+                            GCCollectionMode.Aggressive;
+                        #else
+                            GCCollectionMode.Optimized;
+                        #endif
+                        GC.Collect(GC.MaxGeneration, maxGCCollectionMode, true, true);
+                        GC.Collect(GC.MaxGeneration, maxGCCollectionMode, true, true);
                     }
                 }
                 Write("");
