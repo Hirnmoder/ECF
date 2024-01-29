@@ -10,5 +10,8 @@ namespace ECF.CLI.Arguments
 
         [Option('n', "name", Required = false, Default = "", HelpText = "A string to sign with private key. Usually the name of the key pair holder.")]
         public string Name { get; protected set; }
+
+        [Option("cipher-suite", Default = CLICipherSuite.X25519_ED25519_AESGCM_SHA512, Required = false, HelpText = "Cipher Suite to use.")]
+        public CLICipherSuite CipherSuite { get; protected set; }
     }
 }

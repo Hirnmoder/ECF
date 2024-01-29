@@ -1,4 +1,5 @@
 using ECF.Core.Container;
+using ECF.Core.Container.Recipients;
 
 namespace ECF.Test
 {
@@ -23,8 +24,13 @@ namespace ECF.Test
             for (int i = 0; i < expected.Recipients.Length; i++)
             {
                 Assert.AreEqual(expected.Recipients[i].Name, actual.Recipients[i].Name);
-                Assert.IsTrue(expected.Recipients[i].PublicKey.Export(NSec.Cryptography.KeyBlobFormat.RawPublicKey).SequenceEqual(actual.Recipients[i].PublicKey.Export(NSec.Cryptography.KeyBlobFormat.RawPublicKey)));
-                Assert.IsTrue(expected.Recipients[i].NameSignature.SequenceEqual(actual.Recipients[i].NameSignature));
+                if (expected.Recipients[i] is RX25519Ed25519 er && actual.Recipients[i] is RX25519Ed25519 ar)
+                {
+                    Assert.IsTrue(er.PublicKey.Export(NSec.Cryptography.KeyBlobFormat.RawPublicKey).SequenceEqual(ar.PublicKey.Export(NSec.Cryptography.KeyBlobFormat.RawPublicKey)));
+                }
+                else
+                    Assert.Fail($"Expected {nameof(RX25519Ed25519)}, got {expected.Recipients[i].GetType().Name}.");
+                Assert.IsTrue(expected.Recipients[i].Signature.SequenceEqual(actual.Recipients[i].Signature));
             }
             Assert.AreEqual(expected.ContentStream.Length, actual.ContentStream.Length);
             using var msExpected = new MemoryStream();

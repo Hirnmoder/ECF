@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using ECF.Core.Container;
+using ECF.Core.Container.Keys;
 using ECF.Core.Primitives;
 
 namespace ECF.Test
@@ -26,7 +27,7 @@ namespace ECF.Test
             for (int i = 0; i < n; i++)
                 streams[i] = new MemoryStream(1024);
 
-            using var key = ECFKey.Create();
+            using var key = this.CipherSuite.CreateECFKey();
 
             using var container = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             container.AddRecipientFromPrivateKey(key, RecipientName(0));
@@ -147,7 +148,7 @@ namespace ECF.Test
         {
             var sw = Stopwatch.StartNew();
 
-            using var key = ECFKey.Create();
+            using var key = this.CipherSuite.CreateECFKey();
 
             using var container = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             container.AddRecipientFromPrivateKey(key, RecipientName(0));
@@ -213,7 +214,7 @@ namespace ECF.Test
         {
             var keys = new ECFKey[n];
             for (int i = 0; i < n; i++)
-                keys[i] = ECFKey.Create();
+                keys[i] = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
 
@@ -276,12 +277,12 @@ namespace ECF.Test
         public void AddRecipientsAndDecryptByRecipientExport(int n, int nWrites = 100)
         {
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
-            using var masterKey = ECFKey.Create();
+            using var masterKey = this.CipherSuite.CreateECFKey();
 
             var keysToAdd = new ECFKey[n];
             this.TimeForEach("CreateECFKey", Enumerable.Range(0, n), i =>
             {
-                keysToAdd[i] = ECFKey.Create();
+                keysToAdd[i] = this.CipherSuite.CreateECFKey();
             }, n.ToString());
 
             var exportedRecipientStreams = new MemoryStream[n];

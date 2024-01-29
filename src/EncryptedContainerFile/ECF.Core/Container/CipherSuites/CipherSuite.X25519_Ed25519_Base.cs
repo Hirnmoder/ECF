@@ -1,8 +1,10 @@
 using ECF.Core.Primitives;
+using ECF.Core.Container.Keys;
 using NSec.Cryptography;
 using System;
 using System.Diagnostics;
 using System.IO;
+using ECF.Core.Container.Recipients;
 
 namespace ECF.Core.Container
 {
@@ -27,7 +29,7 @@ namespace ECF.Core.Container
 
         internal override uint GetCiphertextLength(uint plaintextLength)
         {
-             return plaintextLength + (uint)this.SymmetricEncryptionAlgorithm.TagSize;
+            return plaintextLength + (uint)this.SymmetricEncryptionAlgorithm.TagSize;
         }
 
         internal override Key GetSymmetricKey(ECFKey privateKey, KeyAgreementInfo keyAgreementInfo)
@@ -35,7 +37,7 @@ namespace ECF.Core.Container
             if (keyAgreementInfo is not KAI_X25519_Ed25519_Base kai)
                 throw new EncryptedContainerException($"Expected {nameof(KeyAgreementInfo)} of type {nameof(KAI_X25519_Ed25519_Base)}. Got {keyAgreementInfo}.");
 
-            var sk = privateKey.X25519PrivateKey;
+            var sk = this.GetKeyAgreementKey(privateKey);
 
             Debug.Assert(sk.Algorithm == this.KeyAgreementAlgorithm);
             Debug.Assert(kai.PublicKey.Algorithm == this.KeyAgreementAlgorithm);
@@ -80,8 +82,12 @@ namespace ECF.Core.Container
             return k;
         }
 
-        internal override KeyAgreementInfo GetKeyAgreementInfo(PublicKey publicKey, Key symmetricKey)
+        internal override KeyAgreementInfo GetKeyAgreementInfo(Recipient recipient, Key symmetricKey)
         {
+            if (recipient is not RX25519Ed25519 r)
+                throw new EncryptedContainerException($"Expected {nameof(Recipient)} of type {nameof(RX25519Ed25519)}. Got {recipient}.");
+
+            var publicKey = r.PublicKey;
             if (publicKey.Algorithm == this.SignatureAlgorithm)
             {
                 publicKey = KeyConverter.ConvertPublicKey(publicKey, this.KeyAgreementAlgorithm);
@@ -151,19 +157,45 @@ namespace ECF.Core.Container
             => new KAI_X25519_Ed25519_Base.Creator(this.SymmetricEncryptionAlgorithm);
 
         internal override Key GetSigningKey(ECFKey privateKey)
-            => privateKey.Ed25519PrivateKey;
+        {
+            ArgumentNullException.ThrowIfNull(privateKey);
+            if (privateKey is not EKX25519Ed25519 pk)
+                throw new EncryptedContainerException($"Expected {nameof(ECFKey)} of type {nameof(EKX25519Ed25519)}. Got {privateKey}.");
+            return pk.Ed25519PrivateKey;
+        }
 
         internal override Key GetKeyAgreementKey(ECFKey privateKey)
-            => privateKey.X25519PrivateKey;
+        {
+            ArgumentNullException.ThrowIfNull(privateKey);
+            if (privateKey is not EKX25519Ed25519 pk)
+                throw new EncryptedContainerException($"Expected {nameof(ECFKey)} of type {nameof(EKX25519Ed25519)}. Got {privateKey}.");
+            return pk.X25519PrivateKey;
+        }
 
-        internal override Key GetExportKey(ECFKey privateKey)
-            => privateKey.Ed25519PrivateKey;
+        internal override Recipient LoadRecipient(BinaryReader br, bool verifySignature)
+        {
+            return RX25519Ed25519.Load(br, this, verifySignature);
+        }
 
-        internal override int GetExportKeySize()
-            => this.SignatureAlgorithm.PublicKeySize;
+        internal override PublicKey GetIdentificationTagKey(ECFKey privateKey)
+        {
+            if (privateKey is not EKX25519Ed25519 pk)
+                throw new EncryptedContainerException($"Expected {nameof(ECFKey)} of type {nameof(EKX25519Ed25519)}. Got {privateKey}.");
+            return pk.Ed25519PrivateKey.PublicKey;
+        }
 
-        internal override Algorithm GetExportKeyAlgorithm()
-            => this.SignatureAlgorithm;
+        internal override PublicKey GetIdentificationTagKey(Recipient recipient)
+        {
+            if (recipient is not RX25519Ed25519 r)
+                throw new EncryptedContainerException($"Expected {nameof(Recipient)} of type {nameof(RX25519Ed25519)}. Got {recipient}.");
+            return r.PublicKey;
+        }
+
+        /// <inheritdoc/>
+        public override ECFKey CreateECFKey()
+        {
+            return EKX25519Ed25519.Create();
+        }
     }
 
     internal class KAI_X25519_Ed25519_Base : KeyAgreementInfo

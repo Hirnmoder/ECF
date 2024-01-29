@@ -1,8 +1,4 @@
-﻿using ECF.Core.Primitives;
-using NSec.Cryptography;
-using System;
-using System.Diagnostics;
-using System.IO;
+﻿using NSec.Cryptography;
 
 namespace ECF.Core.Container
 {

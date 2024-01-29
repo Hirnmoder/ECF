@@ -1,7 +1,6 @@
 ﻿using ECF.Core.Container;
+using ECF.Core.Container.Keys;
 using ECF.Core.Primitives;
-using System.Diagnostics;
-using System.Text;
 
 namespace ECF.Test
 {
@@ -13,7 +12,7 @@ namespace ECF.Test
         [TestMethod]
         public void CreateAndDecryptContainer()
         {
-            using var key = ECFKey.Create();
+            using var key = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key, RecipientName(0));
@@ -32,7 +31,7 @@ namespace ECF.Test
         {
             string name = "hello 👋🏻";
 
-            using var key = ECFKey.Create();
+            using var key = this.CipherSuite.CreateECFKey();
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key, name);
             using var ms = new MemoryStream();
@@ -49,8 +48,8 @@ namespace ECF.Test
         [TestMethod]
         public void AddRecipientTwiceByPublicKey()
         {
-            using var kCreator = ECFKey.Create();
-            using var kRecipient = ECFKey.Create();
+            using var kCreator = this.CipherSuite.CreateECFKey();
+            using var kRecipient = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(kCreator, RecipientName(0), false);
@@ -106,9 +105,9 @@ namespace ECF.Test
         [TestMethod]
         public void AddRecipientTwiceByName()
         {
-            using var kCreator = ECFKey.Create();
-            using var kRecipientA = ECFKey.Create();
-            using var kRecipientB = ECFKey.Create();
+            using var kCreator = this.CipherSuite.CreateECFKey();
+            using var kRecipientA = this.CipherSuite.CreateECFKey();
+            using var kRecipientB = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(kCreator, RecipientName(0), false);
@@ -147,9 +146,9 @@ namespace ECF.Test
         [TestMethod]
         public void AddRecipientTwiceByNameAllow()
         {
-            using var kCreator = ECFKey.Create();
-            using var kRecipientA = ECFKey.Create();
-            using var kRecipientB = ECFKey.Create();
+            using var kCreator = this.CipherSuite.CreateECFKey();
+            using var kRecipientA = this.CipherSuite.CreateECFKey();
+            using var kRecipientB = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(kCreator, RecipientName(0), false);
@@ -189,9 +188,9 @@ namespace ECF.Test
             var randomData = new byte[1024 * 1024 * 10]; // 10 MB
             randomData.AsSpan().FillRandom();
 
-            using var key1 = ECFKey.Create();
-            using var key2 = ECFKey.Create();
-            using var key3 = ECFKey.Create();
+            using var key1 = this.CipherSuite.CreateECFKey();
+            using var key2 = this.CipherSuite.CreateECFKey();
+            using var key3 = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key1, RecipientName(0));
@@ -245,7 +244,7 @@ namespace ECF.Test
             }
         }
 
-                [TestMethod]
+        [TestMethod]
         public void CreateAndDecryptContainerWithContent10MB()
             => CreateAndDecryptContainerWithContent(10);
 
@@ -258,7 +257,7 @@ namespace ECF.Test
             var randomData = new byte[1024 * 1024 * size]; // size MB
             randomData.AsSpan().FillRandom();
 
-            using var key = ECFKey.Create();
+            using var key = this.CipherSuite.CreateECFKey();
 
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);
             ec.AddRecipientFromPrivateKey(key, RecipientName(0));
@@ -277,6 +276,24 @@ namespace ECF.Test
             using var ms2 = new MemoryStream();
             ecd.ContentStream.CopyTo(ms2);
             Assert.IsTrue(randomData.SequenceEqual(ms2.ToArray()));
+        }
+
+        [TestMethod]
+        public void CreateSaveAndLoadECFKey()
+        {
+            using var passwordBuffer = new FixedBytes(32);
+            passwordBuffer.GetDataAsSpan().FillRandom();
+            using var password = new FixedMemoryStream(passwordBuffer, false);
+            using var key = this.CipherSuite.CreateECFKey();
+            using var ms = new MemoryStream();
+            key.Save(ms, password, 1, 1, new ECFKeyPBKDFArgon2id.Argon2idConfiguration(1, 1000, 1));
+            Assert.IsTrue(ms.Length > 0);
+            var pos = ms.Position;
+            ms.Position = 0;
+            using var key2 = ECFKey.Load(ms, password);
+            Assert.AreEqual(pos, ms.Position);
+
+            Assert.IsTrue(key.GetRecipientPublicKey(this.CipherSuite).Equals(key2.GetRecipientPublicKey(this.CipherSuite)));
         }
     }
 }

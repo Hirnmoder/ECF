@@ -89,7 +89,7 @@ namespace ECF.Core.Primitives
             if (!this.CanWrite)
                 throw new InvalidOperationException("Stream does not allow writing to.");
             this.EnsureCapacity((uint)(this.Position + count));
-            this._Buffer!.CopyFrom(buffer[offset..(offset + count)], (int)this.Position, count);
+            this._Buffer!.CopyFrom(buffer.AsSpan()[offset..(offset + count)], (int)this.Position, count);
             this.Position += count;
             this._Length = Math.Max(this.Length, this.Position);
         }

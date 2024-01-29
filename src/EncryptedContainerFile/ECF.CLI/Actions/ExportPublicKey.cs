@@ -1,6 +1,6 @@
 ﻿using ECF.CLI.Arguments;
 using ECF.Core.Container;
-using ECF.Core.Primitives;
+using ECF.Core.Container.Keys;
 using System;
 using System.IO;
 
@@ -20,7 +20,7 @@ namespace ECF.CLI.Actions
                 while (string.IsNullOrWhiteSpace(name))
                     name = Util.Prompt("Please enter a string to sign (usually the name of the key pair holder): ");
 
-                var exported = k.ExportAsRecipient(CipherSuite.X25519_Ed25519_AesGcm_Sha256, name);
+                var exported = k.ExportAsRecipient(Util.GetCipherSuite(arg.CipherSuite), name);
                 using var fs = File.Create(arg.Filepath);
                 exported.Write(fs);
                 fs.Flush();

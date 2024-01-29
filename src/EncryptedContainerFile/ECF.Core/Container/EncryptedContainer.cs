@@ -1,4 +1,6 @@
-﻿using ECF.Core.Primitives;
+﻿using ECF.Core.Container.Keys;
+using ECF.Core.Container.Recipients;
+using ECF.Core.Primitives;
 using NSec.Cryptography;
 using System;
 using System.Collections.Generic;
@@ -47,15 +49,15 @@ namespace ECF.Core.Container
         public void AddRecipientFromExport(Stream inStream, bool allowDuplicateNames)
         {
             using var br = new BinaryReader(inStream, Encoding.UTF8, leaveOpen: true);
-            var recipient = Recipient.Load(br, this.CipherSuite, true);
+            var recipient = this.CipherSuite.LoadRecipient(br, true);
             this.AddRecipient(recipient, allowDuplicateNames);
         }
 
         public void RemoveRecipientFromExport(Stream inStream)
         {
             using var br = new BinaryReader(inStream, Encoding.UTF8, leaveOpen: true);
-            var recipient = Recipient.Load(br, this.CipherSuite, true);
-            this.RemoveRecipient(recipient.PublicKey);
+            var recipient = this.CipherSuite.LoadRecipient(br, true);
+            this.RemoveRecipient(recipient);
         }
 
         public void RemoveRecipient(string name)
@@ -65,13 +67,13 @@ namespace ECF.Core.Container
                 throw new EncryptedContainerException($"Recipient with name {name} does not exist!");
             if (recipients.Count > 1)
                 throw new EncryptedContainerException($"Multiple Recipients with name {name} exist!");
-            this.RemoveRecipient(recipients[0].PublicKey);
+            this.RemoveRecipient(recipients[0]);
         }
 
         public bool IsECFKeyRecipient(ECFKey privateKey)
         {
-            var pk = privateKey.ExportPublicKey(this.CipherSuite);
-            return this.InternalRecipients.Exists(r => r.PublicKey.Equals(pk));
+            var pk = privateKey.GetRecipientPublicKey(this.CipherSuite);
+            return this.InternalRecipients.Exists(r => r.ComparePublicKey(pk));
         }
 
         public void Write(Stream outStream, bool addFakeRecipients = true)
@@ -223,7 +225,7 @@ namespace ECF.Core.Container
                 Debug.Assert(amount == cipherSuite.SymmetricEncryptionAlgorithm.NonceSize);
 
                 Span<byte> mySaltedHash = stackalloc byte[cipherSuite.HashAlgorithm.HashSize];
-                GetSaltedHash(privateKey.Ed25519PrivateKey.PublicKey, recipientSalt, cipherSuite, mySaltedHash);
+                GetSaltedHash(cipherSuite.GetIdentificationTagKey(privateKey), recipientSalt, cipherSuite, mySaltedHash);
                 var mySaltedHashToSearch = mySaltedHash[..FieldLengthInfo.RECIPIENT_SALTED_HASH];
 
                 KeyAgreementInfo? kai = default;
@@ -275,10 +277,10 @@ namespace ECF.Core.Container
 
         private static RecipientDecryptionInformation GetRecipientDecryptionInformation(Recipient recipient, CipherSuite cipherSuite, Key symmetricKey, ReadOnlySpan<byte> salt)
         {
-            var kai = cipherSuite.GetKeyAgreementInfo(recipient.PublicKey, symmetricKey);
+            var kai = cipherSuite.GetKeyAgreementInfo(recipient, symmetricKey);
 
             Span<byte> saltedHash = stackalloc byte[cipherSuite.HashAlgorithm.HashSize];
-            GetSaltedHash(recipient.PublicKey, salt, cipherSuite, saltedHash);
+            GetSaltedHash(cipherSuite.GetIdentificationTagKey(recipient), salt, cipherSuite, saltedHash);
             return new RecipientDecryptionInformation(saltedHash[..FieldLengthInfo.RECIPIENT_SALTED_HASH].ToArray(), kai);
         }
 
@@ -316,7 +318,7 @@ namespace ECF.Core.Container
             foreach (var recipient in this.InternalRecipients)
             {
                 recipient.Write(bw.BaseStream);
-                Debug.Assert(recipient.NameSignature.Length == this.CipherSuite.SignatureAlgorithm.SignatureSize);
+                Debug.Assert(recipient.Signature.Length == this.CipherSuite.SignatureAlgorithm.SignatureSize);
             }
 
             bw.Write((uint)this.ContentStream.Length);
@@ -372,7 +374,7 @@ namespace ECF.Core.Container
 
             for (uint i = 0; i < nRecipientsPrivate; i++)
             {
-                var r = Recipient.Load(br, cipherSuite, verifySignatureOfEveryRecipient);
+                var r = cipherSuite.LoadRecipient(br, verifySignatureOfEveryRecipient);
                 ec.AddRecipient(r, true); // Allow duplicate names here to proceed loading
             }
 
@@ -400,7 +402,7 @@ namespace ECF.Core.Container
 
         private void AddRecipient(Recipient recipient, bool allowDuplicateNames)
         {
-            var existingRecipient = this.InternalRecipients.Find(r => r.PublicKey.Equals(recipient.PublicKey));
+            var existingRecipient = this.InternalRecipients.Find(r => r.ComparePublicKey(recipient));
             if (existingRecipient == default)
             {
                 if (!allowDuplicateNames && this.InternalRecipients.Find(r => r.Name.Equals(recipient.Name, StringComparison.InvariantCultureIgnoreCase)) != default)
@@ -418,9 +420,9 @@ namespace ECF.Core.Container
             }
         }
 
-        private void RemoveRecipient(PublicKey pk)
+        private void RemoveRecipient(Recipient r)
         {
-            var existingRecipient = this.InternalRecipients.Find(r => r.PublicKey.Equals(pk));
+            var existingRecipient = this.InternalRecipients.Find(r => r.ComparePublicKey(r));
             if (existingRecipient == default)
             {
                 throw new EncryptedContainerException($"Given Public Key is no recipient.");

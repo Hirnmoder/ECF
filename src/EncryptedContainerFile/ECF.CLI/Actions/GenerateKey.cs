@@ -1,5 +1,4 @@
 ﻿using ECF.CLI.Arguments;
-using ECF.Core.Primitives;
 using System;
 
 namespace ECF.CLI.Actions
@@ -19,8 +18,14 @@ namespace ECF.CLI.Actions
                     return ExitCode.Error;
                 }
 
-                using var k = ECFKey.Create();
-                k.SaveToFile(Util.GetKeyfilename(arg), p, arg.Overwrite);
+                var cs = Util.GetCipherSuite(arg.CipherSuite);
+                using var k = cs.CreateECFKey();
+                k.SaveToFileAes256Argon2id(Util.GetKeyfilename(arg), arg.Overwrite, p, new()
+                {
+                    DegreeOfParallelism = 1,
+                    MemorySize = arg.MemorySize,
+                    NumberOfPasses = arg.Iterations,
+                });
                 return ExitCode.OK;
             }
             catch (Exception e)

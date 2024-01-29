@@ -1,4 +1,5 @@
 using ECF.Core.Container;
+using ECF.Core.Container.Keys;
 using ECF.Core.Primitives;
 
 namespace ECF.Test
@@ -63,7 +64,7 @@ namespace ECF.Test
 
             var recipients = new ECFKey[nRecipients];
             for (int i = 0; i < nRecipients; i++)
-                recipients[i] = ECFKey.Create();
+                recipients[i] = this.CipherSuite.CreateECFKey();
 
             for (int i = 0; i < nSamples; i++)
             {
@@ -107,7 +108,7 @@ namespace ECF.Test
 
             var recipients = new ECFKey[nRecipients];
             for (int i = 0; i < nRecipients; i++)
-                recipients[i] = ECFKey.Create();
+                recipients[i] = this.CipherSuite.CreateECFKey();
 
             using var ms = new MemoryStream();
             using var ec = EncryptedContainer.Create(this.CipherSuite, ContentType.Blob);

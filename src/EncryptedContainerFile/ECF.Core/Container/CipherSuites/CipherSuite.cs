@@ -1,7 +1,9 @@
-﻿using ECF.Core.Primitives;
+﻿using ECF.Core.Container.Keys;
+using ECF.Core.Container.Recipients;
 using NSec.Cryptography;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ECF.Core.Container
 {
@@ -52,17 +54,13 @@ namespace ECF.Core.Container
         internal virtual SharedSecret? AgreeOnKey(Key privateKey, PublicKey otherPartyPublicKey, KeyExportPolicies exportPolicy = KeyExportPolicies.None)
             => this.KeyAgreementAlgorithm.Agree(privateKey, otherPartyPublicKey, new() { ExportPolicy = exportPolicy });
 
-        internal virtual Key GetSymmetricKey(ECFKey privateKey, KeyAgreementInfo keyAgreementInfo)
-            => throw new NotImplementedException();
+        internal abstract Key GetSymmetricKey(ECFKey privateKey, KeyAgreementInfo keyAgreementInfo);
 
-        internal virtual KeyAgreementInfo GetKeyAgreementInfo(PublicKey publicKey, Key symmetricKey)
-            => throw new NotImplementedException();
+        internal abstract KeyAgreementInfo GetKeyAgreementInfo(Recipient recipient, Key symmetricKey);
 
-        internal virtual KeyAgreementInfo GetFakeKeyAgreementInfo()
-            => throw new NotImplementedException();
+        internal abstract KeyAgreementInfo GetFakeKeyAgreementInfo();
 
-        internal virtual KeyAgreementInfoCreator GetKeyAgreementInfoCreator()
-            => throw new NotImplementedException();
+        internal abstract KeyAgreementInfoCreator GetKeyAgreementInfoCreator();
 
         internal virtual void Encrypt(Key symmetricKey, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> plaintext, Span<byte> ciphertext, ReadOnlySpan<byte> associatedData = default)
             => this.SymmetricEncryptionAlgorithm.Encrypt(symmetricKey, nonce, associatedData, plaintext, ciphertext);
@@ -70,11 +68,9 @@ namespace ECF.Core.Container
         internal virtual bool Decrypt(Key symmetricKey, ReadOnlySpan<byte> nonce, ReadOnlySpan<byte> ciphertext, Span<byte> plaintext, ReadOnlySpan<byte> associatedData = default)
             => this.SymmetricEncryptionAlgorithm.Decrypt(symmetricKey, nonce, associatedData, ciphertext, plaintext);
 
-        internal virtual uint GetPlaintextLength(uint ciphertextLength)
-            => throw new NotImplementedException();
+        internal abstract uint GetPlaintextLength(uint ciphertextLength);
 
-        internal virtual uint GetCiphertextLength(uint plaintextLength)
-            => throw new NotImplementedException();
+        internal abstract uint GetCiphertextLength(uint plaintextLength);
 
         internal virtual void Hash(ReadOnlySpan<byte> data, Span<byte> hash)
             => this.HashAlgorithm.Hash(data, hash);
@@ -88,19 +84,20 @@ namespace ECF.Core.Container
         internal virtual bool VerifySignature(PublicKey publicKey, ReadOnlySpan<byte> data, ReadOnlySpan<byte> signature)
             => this.SignatureAlgorithm.Verify(publicKey, data, signature);
 
-        internal virtual Key GetExportKey(ECFKey privateKey)
-            => throw new NotImplementedException();
+        internal abstract Key GetSigningKey(ECFKey privateKey);
 
-        internal virtual Key GetSigningKey(ECFKey privateKey)
-            => throw new NotImplementedException();
+        internal abstract Key GetKeyAgreementKey(ECFKey privateKey);
 
-        internal virtual Key GetKeyAgreementKey(ECFKey privateKey)
-           => throw new NotImplementedException();
+        internal abstract Recipient LoadRecipient(BinaryReader br, bool verifySignature);
 
-        internal virtual int GetExportKeySize()
-            => throw new NotImplementedException();
+        internal abstract PublicKey GetIdentificationTagKey(ECFKey privateKey);
 
-        internal virtual Algorithm GetExportKeyAlgorithm()
-            => throw new NotImplementedException();
+        internal abstract PublicKey GetIdentificationTagKey(Recipient recipient);
+
+        /// <summary>
+        /// Creates a new <see cref="ECFKey"/> for this <see cref="CipherSuite"/>.
+        /// </summary>
+        /// <returns>The newly created <see cref="ECFKey"/>.</returns>
+        public abstract ECFKey CreateECFKey();
     }
 }
