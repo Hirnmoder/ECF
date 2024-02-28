@@ -36,6 +36,10 @@
     "ECF.CLI modify": {
       "commandName": "Project",
       "commandLineArgs": "modify test.ecf"
+    },
+    "ECF.CLI modify external": {
+      "commandName": "Project",
+      "commandLineArgs": "modify test.ecf -e nano"
     }
   }
 }
